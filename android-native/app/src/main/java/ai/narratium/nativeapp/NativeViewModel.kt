@@ -168,7 +168,7 @@ class NativeViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) { secrets.save(settings) }
-                _ui.update { it.copy(settings = settings, error = null, screen = Screen.CHAT.takeIf { it.selectedId != null } ?: Screen.LIBRARY) }
+                _ui.update { it.copy(settings = settings, error = null, screen = if (it.selectedId != null) Screen.CHAT else Screen.LIBRARY) }
             } catch (failure: Exception) {
                 _ui.update { it.copy(error = "设置保存失败：" + (failure.message ?: "未知错误")) }
             }
