@@ -27,10 +27,18 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-      - name: Install Android API 36
-        run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
+      - name: Verify preinstalled Android SDK
+        run: |
+          test -n "$ANDROID_HOME"
+          test -d "$ANDROID_HOME"
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' | sort -V | tail -n 1)
+          test -x "$SDKMANAGER"
+          if [ ! -d "$ANDROID_HOME/platforms/android-36" ]; then
+            "$SDKMANAGER" --install "platforms;android-36"
+          fi
+          if [ ! -d "$ANDROID_HOME/build-tools/35.0.0" ]; then
+            "$SDKMANAGER" --install "build-tools;35.0.0"
+          fi
       - name: Set up Gradle 8.13
         uses: gradle/actions/setup-gradle@v4
         with:
